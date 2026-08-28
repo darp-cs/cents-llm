@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import logging
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 
 from app.config import settings
 from app.model_catalog import ModelCatalog, ModelFolder
@@ -16,6 +17,21 @@ from app.schemas import (
     ModelFolderResponse,
     ModelsResponse,
 )
+
+
+def _configure_app_logging() -> None:
+    app_logger = logging.getLogger("cents_llm")
+    app_logger.setLevel(logging.INFO)
+
+    if not app_logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s"))
+        app_logger.addHandler(handler)
+
+    app_logger.propagate = False
+
+
+_configure_app_logging()
 
 app = FastAPI(title=settings.app_name, version="0.1.0")
 provider = OllamaProvider(base_url=settings.ollama_base_url, timeout_seconds=settings.request_timeout_seconds)
@@ -98,15 +114,21 @@ def _to_embeddings_input_list(value: str | list[str]) -> list[str]:
     return value
 
 
+def _request_id_from_request(request: Request) -> str:
+    request_id = request.headers.get("x-request-id", "")
+    cleaned = request_id.strip()
+    return cleaned if cleaned else "-"
+
+
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok", "service": settings.app_name, "provider": settings.llm_provider}
 
 
 @app.get("/v1/models", response_model=ModelsResponse, responses={502: {"model": ErrorResponse}})
-async def list_models(_: Annotated[None, Depends(require_internal_api_key)]):
+async def list_models(request: Request, _: Annotated[None, Depends(require_internal_api_key)]):
     try:
-        models = await provider.list_models()
+        models = await provider.list_models(request_id=_request_id_from_request(request))
     except ProviderError as exc:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
 
@@ -124,6 +146,7 @@ async def list_models(_: Annotated[None, Depends(require_internal_api_key)]):
 )
 async def generate(
     payload: GenerateRequest,
+    request: Request,
     _: Annotated[None, Depends(require_internal_api_key)],
 ):
     if not payload.messages and not payload.system_prompt:
@@ -131,9 +154,10 @@ async def generate(
 
     selected_model = _resolve_generate_model(payload)
     effective_payload = payload.model_copy(update={"model": selected_model})
+    request_id = _request_id_from_request(request)
 
     try:
-        return await provider.generate(effective_payload)
+        return await provider.generate(effective_payload, request_id=request_id)
     except ProviderError as exc:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
 
@@ -145,12 +169,14 @@ async def generate(
 )
 async def embeddings(
     payload: EmbeddingsRequest,
+    request: Request,
     _: Annotated[None, Depends(require_internal_api_key)],
 ):
     selected_model = _resolve_embedding_model(payload)
     inputs = _to_embeddings_input_list(payload.input)
+    request_id = _request_id_from_request(request)
 
     try:
-        return await provider.embed(selected_model, inputs)
+        return await provider.embed(selected_model, inputs, metadata=payload.metadata, request_id=request_id)
     except ProviderError as exc:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
