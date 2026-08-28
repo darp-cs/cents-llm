@@ -50,25 +50,47 @@ if (-not $pythonCmd) {
     throw "Python 3.12 is required but no usable Python 3.12 command was found."
 }
 
-if (-not (Test-Path ".venv")) {
+$venvDir = Join-Path $root ".venv"
+$venvPython = Join-Path $root ".venv\Scripts\python.exe"
+
+$needsVenvCreate = $true
+if (Test-Path $venvPython) {
+    & $venvPython -c "import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 12) else 1)" | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        $needsVenvCreate = $false
+    }
+    else {
+        Write-Host "Existing .venv is not Python 3.12. Recreating virtual environment..."
+        Remove-Item -Recurse -Force $venvDir
+    }
+}
+elseif (Test-Path $venvDir) {
+    Remove-Item -Recurse -Force $venvDir
+}
+
+if ($needsVenvCreate) {
     & $pythonCmd @pythonArgs -m venv .venv
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to create .venv."
     }
 }
 
-$venvPython = Join-Path $root ".venv\Scripts\python.exe"
 if (-not (Test-Path $venvPython)) {
     throw "Virtual environment Python was not found at '$venvPython'."
 }
 
 & $venvPython -c "import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 12) else 1)" | Out-Null
 if ($LASTEXITCODE -ne 0) {
-    throw "The existing .venv is not using Python 3.12. Delete .venv and rerun this script."
+    throw "The virtual environment is not using Python 3.12."
 }
 
 Invoke-CheckedCommand -Command { & $venvPython -m pip install --upgrade pip } -FailureMessage "Failed to upgrade pip."
 Invoke-CheckedCommand -Command { & $venvPython -m pip install -r requirements.txt } -FailureMessage "Failed to install dependencies from requirements.txt."
+
+if ((-not (Test-Path ".env")) -and (Test-Path ".env.example")) {
+    Copy-Item -Path ".env.example" -Destination ".env"
+    Write-Host "Created .env from .env.example."
+}
 
 Write-Host ""
 Write-Host "Setup complete."
