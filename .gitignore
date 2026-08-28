@@ -1,7 +1,6 @@
 .venv/
 __pycache__/
 *.pyc
-.env
 
 # Never commit local model weights or model cache directories.
 /.ollama/

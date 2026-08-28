@@ -15,7 +15,11 @@ class Settings(BaseSettings):
     model_catalog_directory: str = "model_catalog"
     request_timeout_seconds: int = Field(default=120, ge=5, le=600)
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore",
+        protected_namespaces=("settings_",),
+    )
 
 
 @lru_cache

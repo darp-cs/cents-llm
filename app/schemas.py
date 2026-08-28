@@ -11,7 +11,7 @@ class ChatMessage(BaseModel):
 
 
 class GenerateRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", protected_namespaces=())
 
     messages: list[ChatMessage] = Field(default_factory=list)
     system_prompt: str | None = None
@@ -23,7 +23,7 @@ class GenerateRequest(BaseModel):
 
 
 class EmbeddingsRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", protected_namespaces=())
 
     input: str | list[str]
     model: str | None = None
