@@ -2,3 +2,9 @@
 __pycache__/
 *.pyc
 .env
+
+# Never commit local model weights or model cache directories.
+/.ollama/
+/ollama-models/
+/model_weights/
+/model-cache/

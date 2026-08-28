@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     internal_api_key: str = ""
     llm_provider: str = "ollama"
     ollama_base_url: str = "http://127.0.0.1:11434"
-    default_chat_model: str = "qwen2.5:3b-instruct"
+    model_catalog_directory: str = "model_catalog"
     request_timeout_seconds: int = Field(default=120, ge=5, le=600)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
