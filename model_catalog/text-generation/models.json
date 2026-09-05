@@ -1,0 +1,8 @@
+{
+  "default_model": "qwen2.5:3b-instruct",
+  "models": [
+    "qwen2.5:3b-instruct",
+    "llama3.2:3b-instruct",
+    "mistral:7b-instruct"
+  ]
+}

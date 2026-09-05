@@ -1,0 +1,7 @@
+{
+  "default_model": "nomic-embed-text",
+  "models": [
+    "nomic-embed-text",
+    "mxbai-embed-large"
+  ]
+}

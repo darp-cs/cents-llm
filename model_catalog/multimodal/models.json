@@ -1,0 +1,7 @@
+{
+  "default_model": "llava:7b",
+  "models": [
+    "llava:7b",
+    "llava:13b"
+  ]
+}

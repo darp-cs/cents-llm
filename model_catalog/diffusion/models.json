@@ -1,0 +1,7 @@
+{
+  "default_model": "stable-diffusion-xl",
+  "models": [
+    "stable-diffusion-xl",
+    "stable-diffusion-3-medium"
+  ]
+}
