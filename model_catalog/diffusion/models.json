@@ -1,7 +1,8 @@
 {
-  "default_model": "stable-diffusion-xl",
+  "default_model": "stable-diffusion-3.5-medium",
   "models": [
-    "stable-diffusion-xl",
-    "stable-diffusion-3-medium"
+    "stable-diffusion-3.5-medium",
+    "sdxl-turbo",
+    "stable-diffusion-1-5"
   ]
 }

@@ -1,7 +1,9 @@
 {
-  "default_model": "whisper:base",
+  "default_model": "whisper:large-v3-turbo",
   "models": [
-    "whisper:base",
-    "whisper:small"
+    "whisper:large-v3-turbo",
+    "whisper:medium",
+    "whisper:small",
+    "whisper:base"
   ]
 }

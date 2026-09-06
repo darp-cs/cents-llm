@@ -1,7 +1,15 @@
 {
-  "default_model": "qwen2.5-coder:3b",
+  "default_model": "qwen2.5-coder:7b-instruct-q4_K_M",
   "models": [
+    "qwen2.5-coder:1.5b",
     "qwen2.5-coder:3b",
-    "deepseek-coder:6.7b"
+    "deepseek-coder:6.7b",
+    "qwen2.5-coder:7b-instruct-q4_K_M",
+    "codegemma:7b",
+    "codellama:13b",
+    "qwen2.5-coder:14b-instruct-q4_K_M",
+    "deepseek-coder-v2:16b-lite-instruct-q4_K_M",
+    "codestral:22b-v0.1-q4_K_M",
+    "qwen2.5-coder:32b-instruct-q4_K_M"
   ]
 }

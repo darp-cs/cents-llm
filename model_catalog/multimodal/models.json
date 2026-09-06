@@ -1,7 +1,15 @@
 {
-  "default_model": "llava:7b",
+  "default_model": "minicpm-v:8b-2.6-q4_0",
   "models": [
+    "moondream:1.8b",
+    "gemma3:4b-it-q4_K_M",
     "llava:7b",
-    "llava:13b"
+    "minicpm-v:8b-2.6-q4_0",
+    "qwen2.5vl:7b",
+    "llama3.2-vision:11b",
+    "llava:13b",
+    "gemma3:12b-it-q4_K_M",
+    "gemma3:27b-it-q4_K_M",
+    "llava:34b"
   ]
 }
